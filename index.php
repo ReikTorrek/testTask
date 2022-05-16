@@ -1,4 +1,5 @@
 <?php
+//Функция вытаскивания текста из лога
 function getLogArray() {
     $fp = fopen('C:\xampp\htdocs\2022\test\access.log', "r");
     $line = [];
@@ -15,17 +16,16 @@ function getLogArray() {
     return 0;
 }
 
-$stringArray = getLogArray(); // Получаем массив строки из лога
-$pattern = "/(\S+) (\S+) (\S+) \[([^:]+):(\d+:\d+:\d+) ([^\]]+)\] \"(\S+) (.*?) (\S+)\" (\S+) (\S+) (\".*?\") (\".*?\")/"; //Регулярка, по которой будем делить лог
-$result = []; //Массив, в котором будет разделённый лог
-$hits = 0; //Количество хитов
-$unicURL = []; //Уникальный URL
-$traffic = 0; //размер траффика
-$stringNumber = count($stringArray); //Количество строк в файле
-$responseCodes = []; //Массив кодов ответов
-$browserPattern = '/msnbot|Google|Yahoo/'; //Регулярка, по которой мы ищем условных ботов поисковиков.
-$crawler = ''; //Переменная, в которую мы будем получать браузер.
-$crawlers = []; //Массив, в котором будут записаны все браузеры
+//Переменные
+$stringArray = getLogArray();
+$result = [];
+$hits = 0;
+$unicURL = [];
+$traffic = 0;
+$stringNumber = count($stringArray);
+$responseCodes = [];
+$crawler = '';
+$crawlers = [];
 $jsonResult = [
     'hits:' => 0,
     'urls:' => 0,
@@ -34,27 +34,16 @@ $jsonResult = [
 
     'statusCodes:' => [],
     'browsers:' => [],
-]; //массив итогового результата.
-/*
-['ip'] = $result [1];
-['identity'] = $result [2];
-['user'] = $result [3];
-['date'] = $result [4];
-['time'] = $result [5];
-['timezone'] = $result[6];
-['method'] = $result [7];
-['path'] = $result[8];
-['protocol'] = $result[9];
-['status'] = $result[10];
-['bytes'] = $result[11];
-['referer'] = $result[12];
-['agent'] = $result[13];
-*/
-foreach ($stringArray as $string) { // В цикле по очереди разводим массив строк по одной, подставляем под регулярку и выводим в $result, чтобы получить распарсенную строку.
+];
+//Решулярные выражения
+$pattern = "/(\S+) (\S+) (\S+) \[([^:]+):(\d+:\d+:\d+) ([^\]]+)\] \"(\S+) (.*?) (\S+)\" (\S+) (\S+) (\".*?\") (\".*?\")/";
+$browserPattern = '/msnbot|Google|Yahoo/';
+//Блок парсинга массива логов и получения информации.
+foreach ($stringArray as $string) {
     preg_match($pattern, $string, $result);
-    preg_match($browserPattern, $result[13], $crawler); //Парсим строку браузера на наличие ботов поисковиков.
+    preg_match($browserPattern, $result[13], $crawler);
     if (!empty($crawler)) {
-        array_push($crawlers, $crawler[0]); //если есть - пишем в массив.
+        array_push($crawlers, $crawler[0]);
     }
     $traffic += (int) $result[11];
     array_push($responseCodes, $result[10]);
@@ -73,6 +62,6 @@ $jsonResult = [
     'statusCodes:' => $responseCodes,
     'browsers:' => $crawlers,
 ];
-
+//Блок вывоа информации.
 echo json_encode($jsonResult, JSON_HEX_TAG, 3);
 
