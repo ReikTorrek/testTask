@@ -62,6 +62,6 @@ $jsonResult = [
     'statusCodes:' => $responseCodes,
     'browsers:' => $crawlers,
 ];
-//Блок вывоа информации.
+//Блок вывода информации.
 echo json_encode($jsonResult, JSON_HEX_TAG, 3);
 
