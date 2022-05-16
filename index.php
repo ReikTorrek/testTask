@@ -1,5 +1,5 @@
 <?php
-//Функция вытаскивания текста из лога
+//Функция получения текста из лога
 function getLogArray() {
     $fp = fopen('C:\xampp\htdocs\2022\test\access.log', "r");
     $line = [];
